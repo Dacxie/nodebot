@@ -1,6 +1,6 @@
 nd = require('./api').api # Nodelic API // github.com/dacxie/nodelic
 
-# Bot V0.1.2 - Dacx
+# Bot V0.1.3 - Dacx
 
 # Usage: node bot <username> <password> <chat>
 
@@ -48,9 +48,9 @@ botLogin()
 
 processMessage = (message) ->
     messageData =
-        text: t.text.replace(bi.name + ',', '')
+        text: message.text.replace(bi.name + ',', '')
         author:
-            name:  t.from
+            name:  message.from
             right: if !message.fl? then 'user' else message.fl
     messageData.text = messageData.text.substr(1) if messageData.text[0] is ' '
     for command in chatCommands
