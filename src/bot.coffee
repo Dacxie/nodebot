@@ -1,74 +1,74 @@
-nd = require('./api').api #NoDelic
+nd = require('./api').api # Nodelic API // github.com/dacxie/nodelic
 
-# Bot V0.1.0 - Dacx
+# Bot V0.1.1 - Dacx
 
 # Usage: node bot <username> <password> <chat>
-bi =
-    ownr: process.argv[5]
-    name: process.argv[2]
-    pass: process.argv[3]
-    chat: process.argv[4]
-    skey: null
-    ismd: null
-    
-cc = []
 
-ac = (mc, oc) ->
-    cc.push
-        mc: mc
-        oc: oc
+botData =
+    owner:       process.argv[5]
+    username:    process.argv[2]
+    password:    process.argv[3]
+    chat:        process.argv[4]
+    loginKey:    null
+    isModerator: null
+    
+chatCommands = []
+
+addCommand = (condition, onCall) ->
+    chatCommands.push
+        cond: condition
+        call: onCall
         
-ac(
-    (md) ->
-        (md.qt.indexOf('поговори с ') is 0)
+addCommand(
+    (messageData) ->
+        (messageData.text.indexOf('поговори с ') is 0)
     , 
-    (md) ->
-        nd.msg bi.skey, bi.chat, "#{md.qt.substr md.qt.indexOf 'поговори с '}, Мне нечего сказать."
+    (messageData) ->
+        nd.msg botData.skey, botData.chat, "#{messageData.text.substr 11}, Мне нечего сказать."
         return
 )
-ac(
-    (md) ->
-        (md.qt.indexOf('someadminstuff') is 0 && md.au.rg is 'admin')
+addCommand(
+    (messageData) ->
+        (messageData.text.indexOf('someadminstuff') is 0 && messageData.author.right is 'admin')
     ,
-    (md) ->
-        nd.msg bi.skey, bi.chat, 'admin'
+    (messageData) ->
+        nd.msg botData.skey, botData.chat, 'admin'
         return
 )
     
-li = ->
-    nr = nd.login bi.name, bi.pass, bi.chat
-    if nr.status isnt 'success'
+botLogin = ->
+    loginResponse = nd.login botData.username, botData.password, botData.chat
+    if loginResponse.status isnt 'success'
         console.log '[Fatal] Cannot login to chat.'
         process.exit 1
-    bi.skey = nr._
-    bi.ismd = (nr.moder? || nr.admin?)
-    console.log "Logged in, moderator = #{bi.ismd}"
-li()
+    botData.skey = nr._
+    botData.isModerator = (nr.moder? || nr.admin?)
+    console.log "Logged in, moderator = #{botData.isModerator}"
+botLogin()
 
-ga = (t) ->
-    md =
-        qt: t.text.replace(bi.name + ',', '')
-        tx: t.text
-        au:
-            nm: t.from
-            rg: if !t.fl? then 'user' else t.fl
-    md.qt = md.qt.substr(1) if md.qt[0] is ' '
-    for ev in cc
-        if ev.mc md
-            ev.oc md
+processMessage = (message) ->
+    messageData =
+        text: t.text.replace(bi.name + ',', '')
+        author:
+            name:  t.from
+            right: if !message.fl? then 'user' else message.fl
+    messageData.text = messageData.text.substr(1) if messageData.text[0] is ' '
+    for command in chatCommands
+        if command.cond messageData
+            command.call messageData
     
-pl = (r) ->
-    if r.t is 'msg'
-        if r.text.indexOf(bi.name + ',') is 0
-            ga r
+onMessage = (message) ->
+    if message.t is 'msg'
+        if message.text.indexOf(botData.username + ',') is 0
+            processMessage message
             
-bl = ->
-    lr = nd.listen bi.skey, bi.chat
-    for m in lr.m
-        if m.status is 'mustlogin'
+botLoop = ->
+    listenData = nd.listen botData.skey, botData.chat
+    for message in listenData.m
+        if message.status is 'mustlogin'
             console.log '[Danger] Kicked out of chat. Logging in'
-            li()
+            botLogin()
         else
-            pl m
-    bl()
-bl()
+            onMessage message
+    botLoop()
+botLoop()
