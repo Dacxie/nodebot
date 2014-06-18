@@ -1,74 +1,85 @@
-nd = require('./api').api # Nodelic API // github.com/dacxie/nodelic
+api = require('./api').api # Nodelic API // github.com/dacxie/nodelic
+fs  = require 'fs'
 
-# Bot V0.2.0 - Dacx
+# Bot V0.3.0 - Dacx
 
 # Usage: node bot <username> <password> <chat>
 
+# --------------- Bot funtions block --------------- #
+
+constructMessageData = (event) ->
+    text = event.text.replace botData.username + ',', ''
+    text = text.substr 1 if text[0] is ' '
+    messageData =
+        text: text
+        author:
+            name:  event.from
+            right: if event.fl? then event.fl else 'user'
+
+
+botLogin = ->
+    response = api.login botData.username, botData.password, botData.chat
+    if response.status isnt 'success'
+        console.log '[Fatal] Cannot log in'
+        process.exit 1
+    else
+        botData.loginKey    = response._
+        botData.isModerator = (response.moder? || response.admin?)
+        console.log '[Info] Logged in, isModerator: #{botData.isModerator}'
+    return
+        
+
+botSay = (message) ->
+    response = api.msg botData.loginKey, botData.chat, message
+    if response.result isnt 'ACCEPTED' && response.result isnt 'HANDLED'
+        console.log '[Warning] Bot\'s message rejected'
+    return
+
+
+botLoop = ->
+    response = api.listen botData.loginKey, botData.chat
+    for event in response.m
+        if event.status is 'mustlogin' || event.status is 'notlogged'
+            botLogin()
+        else
+            processChatEvent event
+    botLoop()
+    return
+    
+    
+botReact = (event) ->
+    messageData = constructMessageData event
+    for command in botCommands
+        if command.metConditions messageData
+            command.perform messageData
+    return
+    
+    
+reloadBotCommands = ->
+    fileData = fs.readFileSync './bin/commands.js', 'utf8'
+    eval fileData
+    console.log JSON.stringify botCommands
+    
+processChatEvent = (event) ->
+    if event.t is 'msg'
+        if event.text.indexOf(botData.username + ',') is 0
+            botReact event
+    return
+    
+# ----------------- Bot data block ----------------- #
+
 botData =
-    owner:       process.argv[5]
+    ownerName:   process.argv[5]
     username:    process.argv[2]
     password:    process.argv[3]
     chat:        process.argv[4]
     loginKey:    null
     isModerator: null
     
-chatCommands = []
+botCommands = []
 
-addCommand = (condition, onCall) ->
-    chatCommands.push
-        cond: condition
-        call: onCall
-        
-addCommand(
-    (messageData) ->
-        (messageData.text.indexOf('поговори с ') is 0)
-    , 
-    (messageData) ->
-        nd.msg botData.skey, botData.chat, "#{messageData.text.substr 11}, Мне нечего сказать."
-        return
-)
-addCommand(
-    (messageData) ->
-        (messageData.text.indexOf('someadminstuff') is 0 && messageData.author.right is 'admin')
-    ,
-    (messageData) ->
-        nd.msg botData.skey, botData.chat, 'admin'
-        return
-)
-    
-botLogin = ->
-    loginResponse = nd.login botData.username, botData.password, botData.chat
-    if loginResponse.status isnt 'success'
-        console.log '[Fatal] Cannot login to chat.'
-        process.exit 1
-    botData.skey = loginResponse._
-    botData.isModerator = (loginResponse.moder? || loginResponse.admin?)
-    console.log "Logged in, moderator = #{botData.isModerator}"
+# ------------ Bot initialization block ------------ #
+
+reloadBotCommands()
 botLogin()
-
-processMessage = (message) ->
-    messageData =
-        text: message.text.replace(botData.username + ',', '')
-        author:
-            name:  message.from
-            right: if !message.fl? then 'user' else message.fl
-    messageData.text = messageData.text.substr(1) if messageData.text[0] is ' '
-    for command in chatCommands
-        if command.cond messageData
-            command.call messageData
-    
-onMessage = (message) ->
-    if message.t is 'msg'
-        if message.text.indexOf(botData.username + ',') is 0
-            processMessage message
-            
-botLoop = ->
-    listenData = nd.listen botData.skey, botData.chat
-    for message in listenData.m
-        if message.status is 'mustlogin'
-            console.log '[Danger] Kicked out of chat. Logging in'
-            botLogin()
-        else
-            onMessage message
-    botLoop()
 botLoop()
