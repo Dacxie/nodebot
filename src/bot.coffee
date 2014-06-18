@@ -1,6 +1,6 @@
 nd = require('./api').api # Nodelic API // github.com/dacxie/nodelic
 
-# Bot V0.1.1 - Dacx
+# Bot V0.1.2 - Dacx
 
 # Usage: node bot <username> <password> <chat>
 
@@ -41,8 +41,8 @@ botLogin = ->
     if loginResponse.status isnt 'success'
         console.log '[Fatal] Cannot login to chat.'
         process.exit 1
-    botData.skey = nr._
-    botData.isModerator = (nr.moder? || nr.admin?)
+    botData.skey = loginResponse._
+    botData.isModerator = (loginResponse.moder? || loginResponse.admin?)
     console.log "Logged in, moderator = #{botData.isModerator}"
 botLogin()
 
