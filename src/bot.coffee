@@ -25,7 +25,7 @@ botLogin = ->
     else
         botData.loginKey    = response._
         botData.isModerator = (response.moder? || response.admin?)
-        console.log '[Info] Logged in, isModerator: #{botData.isModerator}'
+        console.log "[Info] Logged in, isModerator: #{botData.isModerator}"
     return
         
 
@@ -49,22 +49,32 @@ botLoop = ->
     
 botReact = (event) ->
     messageData = constructMessageData event
-    for event in botEvents
+    for key, event of botEvents
         if event.condition messageData
             event.perform messageData
     return
     
 
-addBotEvent = (condition, perform) ->
-    botEvents.push
+addBotEvent = (name, condition, perform) ->
+    console.log '[Info] Adding event ' + name
+    if botEvents[name]?
+        console.log '[Info] Overwriting event ' + name
+    botEvents[name] =
         condition: condition
         perform:   perform
+    return
     
-    
-reloadBotEvents = ->
-    fileData = fs.readFileSync './bin/events.js', 'utf8'
-    eval fileData
-    
+   
+loadModule = (name) ->
+    try
+        console.log '[Info] Loading module ' + name
+        fileData = fs.readFileSync "./bin/#{name}.js", 'utf8'
+        eval fileData
+        return true
+    catch error
+        console.log '[Warning] Error loading module ' + name
+        return false
+        
     
 processChatEvent = (event) ->
     if event.t is 'msg'
@@ -82,10 +92,10 @@ botData =
     loginKey:    null
     isModerator: null
     
-botEvents = []
+botEvents = {}
 
 # ------------ Bot initialization block ------------ #
 
-reloadBotEvents()
+loadModule 'control'
 botLogin()
 botLoop()
