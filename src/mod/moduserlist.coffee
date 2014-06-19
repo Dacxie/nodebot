@@ -21,8 +21,8 @@ module.exports.init = ->
         return
     @registerEventHandler false, 'getList', 'msgToMe',
     (event) ->
-        event = parse.msg event
-        /onlinelist/.test event.text
+        msg = parse.msg event
+        (/onlinelist/.test msg.text) && !msg.old
     ,
     (event) ->
         botCommand.say JSON.stringify botData.online

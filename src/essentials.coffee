@@ -17,11 +17,13 @@ String::starts = () ->
             text: event.text.replace((if toMe then new RegExp("#{botData.username}, ?", 'i') else ''), '')
             from: event.from
             role: if event.fl? then event.fl else 'user'
+            old:  event.reload
     user: (event) ->
         data =
             type: event.event
-            name:  event.user.name
-            id:    event.user.regId
+            name: event.user.name
+            id:   event.user.regId
+            old:  event.reload
 
 @botCommand =
     say: (message) ->

@@ -1,6 +1,6 @@
 api = require('./api').api # Nodelic API // github.com/dacxie/nodelic
 
-# Bot V0.7.0 - Dacx
+# Bot V0.7.1 - Dacx
 
 # Usage: node bot <username> <password> <chat> <owner>
 
@@ -20,15 +20,15 @@ api = require('./api').api # Nodelic API // github.com/dacxie/nodelic
 needReload = true
 @botLoop = ->
     response = api.listen botData.loginKey, botData.chat, needReload
-    needReload = false if needReload
     try
         for event in response.m
             if event.status is 'mustlogin' || event.status is 'notlogged'
                 botLogin()
             else
-                botModules.notifyHandlers event
+                botModules.notifyHandlers event, needReload
     catch error
         console.log '[Error] In bot loop'
+    needReload = false if needReload
     botLoop()
     return
     

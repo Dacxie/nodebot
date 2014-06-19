@@ -1,7 +1,8 @@
 module.exports.init = ->
     @registerEventHandler false, 'loadModule', 'msgToMe',
     (event) ->
-        (/module load (mod[a-z0-9]+)/.test parse.msg(event, yes).text) && parse.msg(event).role is 'admin'
+        msg = parse.msg event, yes
+        (/module load (mod[a-z0-9]+)/.test msg.text) && msg.role is 'admin' && !msg.old
     ,
     (event) ->
         name = parse.msg(event, yes).text.match(/module load (mod[a-z0-9]+)/)[1]
@@ -10,7 +11,8 @@ module.exports.init = ->
         
     @registerEventHandler false, 'unloadModule', 'msgToMe',
     (event) ->
-        (/module unload (mod[a-z0-9]+)/.test parse.msg(event, yes).text) && parse.msg(event).role is 'admin'
+        msg = parse.msg event, yes
+        (/module unload (mod[a-z0-9]+)/.test msg.text) && msg.role is 'admin' && !msg.old
     ,
     (event) ->
         name = parse.msg(event, yes).text.match(/module unload (mod[a-z0-9]+)/)[1]
@@ -19,7 +21,8 @@ module.exports.init = ->
     
     @registerEventHandler false, 'listModule', 'msgToMe',
     (event) ->
-        (/module list/.test parse.msg(event, yes).text) && parse.msg(event).role is 'admin'
+        msg = parse.msg event, yes
+        (/module list/.test msg.text) && msg.role is 'admin' && !msg.old
     ,
     (event) ->
         list = ''

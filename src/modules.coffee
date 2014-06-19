@@ -83,7 +83,8 @@ class @BotModule
             console.log "[Info][Modules] Unloading module #{name}"
         delete botModules.modules[name]
         return 'Unloaded successfully'
-    notifyHandlers: (event) ->
+    notifyHandlers: (event, reload) ->
+        event.reload = reload
         for name, module of botModules.modules
             module.handleEvent event
             
