@@ -1,7 +1,7 @@
 api = require('./api').api # Nodelic API // github.com/dacxie/nodelic
 fs  = require 'fs'
 
-# Bot V0.4.0 - Dacx
+# Bot V0.5.0 - Dacx
 
 # Usage: node bot <username> <password> <chat>
 
