@@ -2,7 +2,7 @@ addBotEvent(
     'moduleLoad'
     ,
     (messageData) ->
-        (messageData.text.match /module load ([a-z0-9-]+)/)
+        (messageData.text.match /module load ([a-z0-9-]+)/) && (messageData.author.right is 'admin')
     ,
     (messageData) ->
         module = messageData.text.match(/module load ([a-z0-9-]+)/)[1]
