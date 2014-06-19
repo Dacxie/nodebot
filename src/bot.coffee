@@ -1,7 +1,7 @@
 api = require('./api').api # Nodelic API // github.com/dacxie/nodelic
 fs  = require 'fs'
 
-# Bot V0.3.0 - Dacx
+# Bot V0.4.0 - Dacx
 
 # Usage: node bot <username> <password> <chat>
 
@@ -49,16 +49,22 @@ botLoop = ->
     
 botReact = (event) ->
     messageData = constructMessageData event
-    for command in botCommands
-        if command.metConditions messageData
-            command.perform messageData
+    for event in botEvents
+        if event.condition messageData
+            event.perform messageData
     return
     
+
+addBotEvent = (condition, perform) ->
+    botEvents.push
+        condition: condition
+        perform:   perform
     
-reloadBotCommands = ->
-    fileData = fs.readFileSync './bin/commands.js', 'utf8'
+    
+reloadBotEvents = ->
+    fileData = fs.readFileSync './bin/events.js', 'utf8'
     eval fileData
-    console.log JSON.stringify botCommands
+    
     
 processChatEvent = (event) ->
     if event.t is 'msg'
@@ -76,10 +82,10 @@ botData =
     loginKey:    null
     isModerator: null
     
-botCommands = []
+botEvents = []
 
 # ------------ Bot initialization block ------------ #
 
-reloadBotCommands()
+reloadBotEvents()
 botLogin()
 botLoop()
