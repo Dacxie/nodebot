@@ -1,25 +1,25 @@
 module.exports.init = ->
     @registerEventHandler false, 'loadModule', 'msgToMe',
     (event) ->
-        (/module load (mod[a-z0-9]+)/.test parse.msgToMe(event).text) && parse.msgToMe(event).author.right is 'admin'
+        (/module load (mod[a-z0-9]+)/.test parse.msg(event, yes).text) && parse.msg(event).role is 'admin'
     ,
     (event) ->
-        name = parse.msgToMe(event).text.match(/module load (mod[a-z0-9]+)/)[1]
+        name = parse.msg(event, yes).text.match(/module load (mod[a-z0-9]+)/)[1]
         botSay 'Status: ' + botModules.loadModule name
         return
         
     @registerEventHandler false, 'unloadModule', 'msgToMe',
     (event) ->
-        (/module unload (mod[a-z0-9]+)/.test parse.msgToMe(event).text) && parse.msgToMe(event).author.right is 'admin'
+        (/module unload (mod[a-z0-9]+)/.test parse.msg(event, yes).text) && parse.msg(event).role is 'admin'
     ,
     (event) ->
-        name = parse.msgToMe(event).text.match(/module unload (mod[a-z0-9]+)/)[1]
+        name = parse.msg(event, yes).text.match(/module unload (mod[a-z0-9]+)/)[1]
         botSay 'Status: ' + botModules.unloadModule name
         return
     
     @registerEventHandler false, 'listModule', 'msgToMe',
     (event) ->
-        (/module list/.test parse.msgToMe(event).text) && parse.msgToMe(event).author.right is 'admin'
+        (/module list/.test parse.msg(event, yes).text) && parse.msg(event).role is 'admin'
     ,
     (event) ->
         list = ''
