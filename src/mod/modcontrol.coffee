@@ -5,7 +5,7 @@ module.exports.init = ->
     ,
     (event) ->
         name = parse.msg(event, yes).text.match(/module load (mod[a-z0-9]+)/)[1]
-        botSay 'Status: ' + botModules.loadModule name
+        botCommand.say 'Status: ' + botModules.loadModule name
         return
         
     @registerEventHandler false, 'unloadModule', 'msgToMe',
@@ -14,7 +14,7 @@ module.exports.init = ->
     ,
     (event) ->
         name = parse.msg(event, yes).text.match(/module unload (mod[a-z0-9]+)/)[1]
-        botSay 'Status: ' + botModules.unloadModule name
+        botCommand.say 'Status: ' + botModules.unloadModule name
         return
     
     @registerEventHandler false, 'listModule', 'msgToMe',
@@ -30,7 +30,7 @@ module.exports.init = ->
         list = 'Modules: ' + list
         if list.length > 300
             loop
-                botSay list
+                botCommand.say list
                 list = list.substr 300
-        botSay list
+        botCommand.say list
         return
