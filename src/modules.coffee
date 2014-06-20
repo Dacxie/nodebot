@@ -5,10 +5,10 @@ class @BotModule
         @name = name
         @localStorage = {}
         @eventHandlers = 
-            message: {}
-            user:    {}
-            msgToMe: {}
-            all:     {}
+            message:    {}
+            user:       {}
+            msgToMe:    {}
+            all:        {}
         init.apply this
     
     log: (type, data) ->
