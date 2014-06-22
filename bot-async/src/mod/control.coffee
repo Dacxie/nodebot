@@ -2,7 +2,7 @@ module.exports.init = ->
     @registerHandler 'loadMessage', 'talk', true,
     (event) ->
         msg = parse.msg event, yes
-        adminCommand msg, /^module load [a-z0-9-]+/
+        command msg, /^module load [a-z0-9-]+/, 'admin'
     ,
     (event) ->
         module = parse.msg(event, yes).text.match(/^module load ([a-z0-9-]+)/)[1]
@@ -18,7 +18,7 @@ module.exports.init = ->
     @registerHandler 'unloadMessage', 'talk', true,
     (event) ->
         msg = parse.msg event, yes
-        adminCommand msg, /^module unload [a-z0-9-]+/
+        command msg, /^module unload [a-z0-9-]+/, 'admin'
     ,
     (event) ->
         module = parse.msg(event, yes).text.match(/^module unload ([a-z0-9-]+)/)[1]
@@ -34,7 +34,7 @@ module.exports.init = ->
     @registerHandler 'reloadMessage', 'talk', true,
     (event) ->
         msg = parse.msg event, yes
-        adminCommand msg, /^module reload [a-z0-9-]+/
+        command msg, /^module reload [a-z0-9-]+/, 'admin'
     ,
     (event) ->
         module = parse.msg(event, yes).text.match(/^module reload ([a-z0-9-]+)/)[1]
@@ -50,7 +50,7 @@ module.exports.init = ->
     @registerHandler 'listMessage', 'talk', true,
     (event) ->
         msg = parse.msg event, yes
-        adminCommand msg, /module list/
+        command msg, /module list/, 'admin'
     ,
     (event) ->
         list = ''

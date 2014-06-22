@@ -17,6 +17,13 @@ bot.cmd =
             else
                 return
         return
+    kick: (who, why, callback) ->
+        api.kick bot.data.key, bot.data.chat, who, why, (error, data) ->
+            if callback?
+                callback error, data
+            else
+                return
+        return
     
 @parse =
     msg: (event, toMe) ->
@@ -33,5 +40,17 @@ bot.cmd =
             id: event.user.regId
             old: event.reload
             
-@adminCommand = (message, regex) ->
-    regex.test(message.text) && message.role is 'admin' && !message.old
+roleToInteger = (role) ->
+    int = -1
+    switch role
+        when 'user'
+            int = 0
+        when 'moder'
+            int = 1
+        when 'admin'
+            int = 2
+    int
+    
+            
+@command = (message, regex, role) ->
+    regex.test(message.text) && roleToInteger(message.role) >= roleToInteger(role) && !message.old

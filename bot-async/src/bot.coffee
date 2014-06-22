@@ -22,15 +22,22 @@
                 process.exit 1
             return
         return
+    handle: (event) ->
+        if event.status is 'notlogged' || event.status is 'mustlogin'
+            bot.data.key = null
+            bot.login bot.action
+            return
+        bot.modules.notify event, bot.needsReload
+        return
     action: ->
+        if bot.data.key is null
+            return
         api.listen bot.data.key, bot.data.chat, bot.needsReload, (error, data) ->
-            #try
-            for event in data.m
-                if event.status is 'mustlogin' || event.status is 'notlogged'
-                    bot.login()
-                bot.modules.notify event, bot.needsReload
-            #catch exception
-            #    console.log '[Error] Catched in bot loop'
-            #    console.log exception
+            try
+                for event in data.m
+                    bot.handle event
+            catch exception
+                console.log '[Error] Catched in bot loop'
+                console.log exception
             bot.needsReload = no if bot.needsReload
             bot.action()

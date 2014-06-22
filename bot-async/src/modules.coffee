@@ -85,6 +85,11 @@ bot.modules =
             callback null, {error: 'Not loaded'}
             return
         delete bot.modules.loaded[name]
+        if require.cache[require.resolve "./mod/#{name}.js"]
+            delete require.cache[require.resolve "./mod/#{name}.js"]
+            console.log '[Info][Modules] In unload: Deleted cache of ' + name
+        else
+            console.log '[Warning][Modules] In unload: Unable to access cache of ' + name
         console.log '[Info][Modules] In unload: Unloaded module: ' + name
         callback null, 1
         return

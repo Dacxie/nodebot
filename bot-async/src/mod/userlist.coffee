@@ -24,7 +24,7 @@ module.exports.init = ->
     @registerHandler 'displayList', 'talk', false,
     (event) ->
         msg = parse.msg event, yes
-        adminCommand msg, /^onlinelist display/
+        command msg, /^onlinelist display/, 'admin'
     ,
     (event) ->
         bot.cmd.say JSON.stringify bot.data.online
