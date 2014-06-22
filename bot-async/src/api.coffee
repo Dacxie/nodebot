@@ -11,6 +11,7 @@ post = (url, data, callback) ->
             callback null, JSON.parse body
         catch error
             console.log '[Error] Network error'
+            console.log '[Error] ' + error
             callback null, 1
         return
     return

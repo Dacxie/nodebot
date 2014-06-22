@@ -28,6 +28,7 @@ bot.cmd =
 @parse =
     msg: (event, toMe) ->
         data =
+            processed: yes
             text: event.text.replace((if toMe then new RegExp("#{bot.data.name}, ?", 'i') else ''), '')
             from: event.from
             role: if event.fl? then event.fl else 'user'
@@ -35,12 +36,13 @@ bot.cmd =
             old: event.reload
     user: (event) ->
         data =
+            processed: yes
             type: event.event
             name: event.user.name
             id: event.user.regId
             old: event.reload
             
-roleToInteger = (role) ->
+getRole = (role) ->
     int = -1
     switch role
         when 'user'
@@ -51,6 +53,31 @@ roleToInteger = (role) ->
             int = 2
     int
     
+@setCommand = (regexes, groups, role) ->
+    command =
+        regexes:    regexes
+        groups:     groups
+        role:       role
+        
+@testCommand = (command, message, talk) ->
+    if talk?
+        message = parse.msg message, talk
+    match = 0
+    for regex, index in command.regexes
+        match = index + 1 if regex.test(message.text)
+    return no if match is 0
+    return no if message.old
+    return no if (getRole(message.role) < getRole(command.role)) && message.from isnt bot.data.owner
+    return match
+    
+@parseCommand = (command, regex, message, talk) ->
+    if talk?
+        message = parse.msg message, talk
+    return null if !testCommand command, message
+    matches = message.text.match command.regexes[regex]
+    result = {}
+    for group in command.groups
+        if group.regex is regex
+            result[group.name] = matches[group.match]
+    result
             
-@command = (message, regex, role) ->
-    regex.test(message.text) && roleToInteger(message.role) >= roleToInteger(role) && !message.old

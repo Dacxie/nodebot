@@ -1,56 +1,57 @@
 module.exports.init = ->
-    @registerHandler 'loadMessage', 'talk', true,
+    commands =
+        load:   setCommand([/^module load ([a-z0-9-]+)/], [{name: 'name', regex: 0, match: 1}], 'admin')
+        unload: setCommand([/^module unload ([a-z0-9-]+)/], [{name: 'name', regex: 0, match: 1}], 'admin')
+        reload: setCommand([/^module reload ([a-z0-9-]+)/], [{name: 'name', regex: 0, match: 1}], 'admin')
+        list:   setCommand([/^module list/], [], 'admin')
+    @registerHandler 'loadMessage', 'talk', yes,
     (event) ->
-        msg = parse.msg event, yes
-        command msg, /^module load [a-z0-9-]+/, 'admin'
+        testCommand commands.load, event, yes
     ,
     (event) ->
-        module = parse.msg(event, yes).text.match(/^module load ([a-z0-9-]+)/)[1]
+        module = parseCommand(commands.load, 0, event, yes).name
         bot.modules.load module, (error, result) ->
             if result.error?
-                bot.cmd.say 'Error: ' + result.error
+                bot.cmd.say 'Ошибка: ' + result.error
                 return
             if result is 1
-                bot.cmd.say 'Loaded: ' + module
+                bot.cmd.say 'Загружено: ' + module
                 return
             return
         return
-    @registerHandler 'unloadMessage', 'talk', true,
+    @registerHandler 'unloadMessage', 'talk', yes,
     (event) ->
-        msg = parse.msg event, yes
-        command msg, /^module unload [a-z0-9-]+/, 'admin'
+        testCommand commands.unload, event, yes
     ,
     (event) ->
-        module = parse.msg(event, yes).text.match(/^module unload ([a-z0-9-]+)/)[1]
+        module = parseCommand(commands.unload, 0, event, yes).name
         bot.modules.unload module, (error, result) ->
             if result.error?
-                bot.cmd.say 'Error: ' + result.error
+                bot.cmd.say 'Ошибка: ' + result.error
                 return
             if result is 1
-                bot.cmd.say 'Unloaded: ' + module
+                bot.cmd.say 'Выгружено: ' + module
                 return
             return
         return
-    @registerHandler 'reloadMessage', 'talk', true,
+    @registerHandler 'reloadMessage', 'talk', yes,
     (event) ->
-        msg = parse.msg event, yes
-        command msg, /^module reload [a-z0-9-]+/, 'admin'
+        testCommand commands.reload, event, yes
     ,
     (event) ->
-        module = parse.msg(event, yes).text.match(/^module reload ([a-z0-9-]+)/)[1]
+        module = parseCommand(commands.reload, 0, event, yes).name
         bot.modules.reload module, (error, result) ->
             if result.error?
-                bot.cmd.say 'Error: ' + result.error
+                bot.cmd.say 'Ошибка: ' + result.error
                 return
             if result is 1
-                bot.cmd.say 'Reloaded: ' + module
+                bot.cmd.say 'Перезагружено: ' + module
                 return
             return
         return
-    @registerHandler 'listMessage', 'talk', true,
+    @registerHandler 'listMessage', 'talk', yes,
     (event) ->
-        msg = parse.msg event, yes
-        command msg, /module list/, 'admin'
+        testCommand commands.list, event, yes
     ,
     (event) ->
         list = ''
@@ -58,7 +59,7 @@ module.exports.init = ->
             if list isnt ''
                 list += ', '
             list += name
-        list = 'Loaded: ' + list
+        list = 'Загружено: ' + list
         if list.length > 300
             loop
                 bot.cmd.say list

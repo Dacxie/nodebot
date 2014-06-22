@@ -1,6 +1,8 @@
 _ = require 'underscore'
 
 module.exports.init = ->
+    commands =
+        list: setCommand([/^onlinelist display/], [], 'admin')
     bot.data.online = []
     add = (name) ->
         bot.data.online = _.without bot.data.online, name
@@ -23,8 +25,7 @@ module.exports.init = ->
         return
     @registerHandler 'displayList', 'talk', false,
     (event) ->
-        msg = parse.msg event, yes
-        command msg, /^onlinelist display/, 'admin'
+        testCommand commands.list, event, yes
     ,
     (event) ->
         bot.cmd.say JSON.stringify bot.data.online

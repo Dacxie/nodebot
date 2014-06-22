@@ -64,12 +64,21 @@ bot.modules =
         catch exception
             console.log '[Error][Modules] In load: Load error: ' + name
             console.log "[Error][Modules] #{exception}"
+            delete bot.modules.loaded[name]
+            if require.cache[require.resolve "./mod/#{name}.js"]
+                delete require.cache[require.resolve "./mod/#{name}.js"]
+                console.log '[Info][Modules] In load: Deleted cache of ' + name
             callback null, {error: 'Load error'}
             return
         try
             bot.modules.loaded[name] = new BotModule name, init
         catch exception
             console.log '[Error][Modules] In load: Error in module: ' + name
+            console.log '[Error][Modules] In load: ' + exception
+            delete bot.modules.loaded[name]
+            if require.cache[require.resolve "./mod/#{name}.js"]
+                delete require.cache[require.resolve "./mod/#{name}.js"]
+                console.log '[Info][Modules] In load: Deleted cache of ' + name
             callback null, {error: 'Error in module'}
             return
         console.log '[Info][Modules] In load: Loaded: ' + name

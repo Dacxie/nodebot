@@ -1,4 +1,4 @@
-# NodelicBot v0.1.0-Sync
+# NodelicBot v0.3.0-ASync
 
 @api = require('./api').api
 
@@ -10,6 +10,7 @@
         pass: process.argv[3]
         chat: process.argv[4]
         role: null
+        owner: process.argv[5]
     login: (callback) ->
         api.login bot.data.name, bot.data.pass, bot.data.chat, (error, data) ->
             if data.status is 'success'
