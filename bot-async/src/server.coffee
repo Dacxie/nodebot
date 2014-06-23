@@ -57,14 +57,21 @@ processPost = (response, act, data, callback) ->
 http.createServer (request, response) ->
     data = url.parse(request.url, true).query
     response.writeHead(200, 'OK', {'Content-Type': 'text/plain'})
-    if hash.createHash('md5').update(data.auth).digest('hex') is password
-        processPost response, path.basename(request.url), data, ->
+    if data.auth?
+        if hash.createHash('md5').update(data.auth).digest('hex') is password
+            processPost response, path.basename(request.url), data, ->
+                response.end()
+        else
+            if data['callback']
+                response.write data['callback'] + '({error: \'wrongPassword\'})'
+            else
+                response.write '{error: \'wrongPassword\'}'
             response.end()
     else
         if data['callback']
-            response.write data['callback'] + '({error: \'invalidAuth\'})'
+            response.write data['callback'] + '({error: \'noPassword\'})'
         else
-            response.write '{error: \'invalidAuth\'}'
+            response.write '{error: \'noPassword\'}'
         response.end()
 .listen 4234
 
