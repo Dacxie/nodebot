@@ -30,6 +30,15 @@ exports.api =
             password: pass
         , callback
         return
+    relogin: (name, chat, key, pass, callback) ->
+        post url.login,
+            act: 'login'
+            chat: chat
+            _: key
+            login: name
+            password: pass
+        , callback
+        return
     logout: (skey, chat, callback) ->
         post url.action,
             act: 'logout'

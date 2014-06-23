@@ -24,6 +24,41 @@ bot.cmd =
             else
                 return
         return
+    ban: (who, why, time, clear, callback) ->
+        api.ban bot.data.key, bot.data.chat, who, why, time, clear, (error, data) ->
+            if callback?
+                callback error, data
+            else
+                return
+        return
+    warn: (who, why, callback) ->
+        api.warn bot.data.key, bot.data.chat, who, why, (error, data) ->
+            if callback?
+                callback error, data
+            else
+                return
+        return
+    status: (status, callback) ->
+        api.status bot.data.key, bot.data.chat, status, (error, data) ->
+            if callback?
+                callback error, data
+            else
+                return
+        return
+    color: (color, callback) ->
+        api.color bot.data.key, bot.data.chat, color, (error, data) ->
+            if callback?
+                callback error, data
+            else
+                return
+        return
+    logout: (callback) ->
+        api.logout bot.data.key, bot.data.chat, (error, data) ->
+            if callback?
+                callback error, data
+            else
+                return
+        return
     
 @parse =
     msg: (event, toMe) ->

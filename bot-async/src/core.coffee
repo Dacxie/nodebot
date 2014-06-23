@@ -13,6 +13,7 @@ include = (file) ->
 include 'bot'
 include 'essentials'
 include 'modules'
+include 'server'
 bot.modules.load 'control', ->
 bot.modules.load 'userlist', ->
     bot.login ->

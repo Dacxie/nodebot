@@ -24,24 +24,30 @@ class @BotModule
             condition: condition
             handler:   handler
         return
-    notify: (event, type) ->
+    notify: (event, type, status) ->
         if !@handlers[type]?
             @log 'Error', 'In notify: Invalid type: ' + type
             return
         conflict = false
-        for name, handler of @handlers[type]
-            if !(handler.conflict && conflict) && handler.condition event
-                handler.handler event
-                conflict = yes if handler.conflict
+        try
+            for name, handler of @handlers[type]
+                if handler.condition(event) && !((conflict || status.conflict[type]) && handler.conflict)
+                    if handler.conflict
+                        conflict = true
+                        status.conflict[type] = true
+                    handler.handler event
+        catch error
+            console.log '[Error][Modules] Catched in ' + @name + '.notify'
+            console.log '[Error][Modules] ' + error
         return
-    handle: (event) ->
-        @notify event, 'all'
+    handle: (event, status) ->
+        @notify event, 'all', status
         if event.t is 'msg'
-            @notify event, 'msg'
+            @notify event, 'msg', status
             if event.text.starts bot.data.name + ','
-                @notify event, 'talk'
+                @notify event, 'talk', status
         if event.t is 'user'
-            @notify event, 'user'
+            @notify event, 'user', status
         return
 bot.modules =
     loaded: {}
@@ -124,6 +130,11 @@ bot.modules =
         return
     notify: (event, reload) ->
         event.reload = reload
+        status = {conflict: {all: no, talk: no, user: no, msg: no}}
         for name, module of bot.modules.loaded
-            module.handle event
+            try
+                module.handle event, status
+            catch error
+                console.log '[Error][Modules] Catched in modules.notify'
+                console.log '[Error][Modules] ' + error
         return
