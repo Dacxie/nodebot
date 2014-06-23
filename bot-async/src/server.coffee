@@ -57,7 +57,7 @@ processPost = (response, act, data, callback) ->
 http.createServer (request, response) ->
     data = url.parse(request.url, true).query
     response.writeHead(200, 'OK', {'Content-Type': 'text/plain'})
-    if hash.createHash('md5').update(query.auth).digest('hex') is password
+    if hash.createHash('md5').update(data.auth).digest('hex') is password
         processPost response, path.basename(request.url), data, ->
             response.end()
     else
