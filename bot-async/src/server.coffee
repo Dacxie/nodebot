@@ -1,6 +1,9 @@
 http = require 'http'
 url  = require 'url'
 path = require 'path'
+hash = require 'crypto'
+
+password = '9ac47ce9482862df7560842e4f98198c'
 
 processPost = (response, act, data, callback) ->
     return if !/((bot|api|mod)\.[a-z]+)/.test act
@@ -54,7 +57,14 @@ processPost = (response, act, data, callback) ->
 http.createServer (request, response) ->
     data = url.parse(request.url, true).query
     response.writeHead(200, 'OK', {'Content-Type': 'text/plain'})
-    processPost response, path.basename(request.url), data, ->
+    if hash.createHash('md5').update(query.auth).digest('hex') is password
+        processPost response, path.basename(request.url), data, ->
+            response.end()
+    else
+        if data['callback']
+            response.write data['callback'] + '({error: \'invalidAuth\'})'
+        else
+            response.write '{error: \'invalidAuth\'}'
         response.end()
 .listen 4234
 
