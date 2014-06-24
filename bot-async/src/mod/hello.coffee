@@ -1,6 +1,6 @@
 _ = require 'underscore'
 
-exports.module.init = ->
+module.exports.init = ->
     hello = [
         'драститя'
         'проходи, браток'
