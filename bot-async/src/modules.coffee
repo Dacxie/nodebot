@@ -137,5 +137,4 @@ bot.modules =
             catch error
                 console.log '[Error][Modules] Catched in modules.notify'
                 console.log '[Error][Modules] ' + error
-        delete status
         return
