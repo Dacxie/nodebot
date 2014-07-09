@@ -66,6 +66,7 @@ bot.cmd =
             processed: yes
             text: event.text.replace((if toMe then new RegExp("#{bot.data.name}, ?", 'i') else ''), '')
             from: event.from
+            uid:  event.fromId
             role: if event.fl? then event.fl else 'user'
             id: event.id
             old: event.reload
@@ -86,6 +87,8 @@ getRole = (role) ->
             int = 1
         when 'admin'
             int = 2
+        when 'owner'
+            int = 3
     int
     
 @setCommand = (regexes, groups, role) ->
@@ -102,7 +105,7 @@ getRole = (role) ->
         match = index + 1 if regex.test(message.text)
     return no if match is 0
     return no if message.old
-    return no if (getRole(message.role) < getRole(command.role)) && message.from isnt bot.data.owner
+    return no if (getRole(message.role) < getRole(command.role)) && !(message.from is bot.data.owner && message.uid?)
     return match
     
 @parseCommand = (command, regex, message, talk) ->

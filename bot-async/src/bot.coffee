@@ -26,7 +26,7 @@
                 return
         else
             api.login bot.data.name, bot.data.pass, bot.data.chat, (error, data) ->
-                if data.status is 'success'
+                if data.result is 'success'
                     bot.data.role = if (data.moder? || data.admin?) then 'moder' else 'user'
                     bot.data.key  = data._
                     bot.data.logged = yes
@@ -53,9 +53,9 @@
     action: ->
         api.listen bot.data.key, bot.data.chat, bot.needsReload, (error, data) ->
             try
-                for event in data.m
+                for event in data
                     bot.handle event
-                delete data.m
+                delete data
             catch exception
                 console.log '[Error] Catched in bot loop'
                 console.log exception
