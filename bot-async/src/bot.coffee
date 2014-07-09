@@ -55,7 +55,6 @@
             try
                 for event in data
                     bot.handle event
-                delete data
             catch exception
                 console.log '[Error] Catched in bot loop'
                 console.log exception
